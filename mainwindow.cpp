@@ -1,8 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "model.h"
 #include <QTimer>
 #include <vector>
+#include <iostream>
+#include <stdlib.h>
 using std::vector;
+using std::cout;
+using std::endl;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -14,11 +19,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                                          "QPushButton:pressed {background-color: rgb(150,150,255);}"));
     ui->startButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,215,100);}"
                                           "QPushButton:pressed {background-color: rgb(250,215,150);}"));
-    connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startButtonClickedSlot);
+    connect(ui->startButton, &QPushButton::clicked, this, &model::startButtonClickedSlot);
 
-//    connect(ui->blueButton, &QPushButton::clicked, this, &MainWindow::checkInputBlue);
-
-//    connect(ui->redButton, &QPushButton::clicked, this, &MainWindow::checkInputRed);
+    connect(&model, &model::flashColor, this);
+    connect(&model, &model::disableStart, ui->startButton, &QPushButton::setDisabled);
 
     gameOver = false;
 
@@ -29,59 +33,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::startButtonClickedSlot()
+void MainWindow::flash(int colorCode)
 {
-    vector<button> pattern;
-    int patternLength = 3;
-    QTimer timer(this);
-    while (patternLength > 0)
-    {
-        if (rand() < 0.5)
-        {
-            pattern.push_back(button.blue);
-        }
-        else
-        {
-            pattern.push_back(button.red);
-        }
-        patternLength--;
-    }
 
-    while (!gameOver)
-    {
-        for (button color : pattern)
-        {
-            if (color == button.blue)
-            {
-                //light up blue
-                timer.start(1000);
-                ui->blueButton->animateClick();
-            }
-            else
-            {
-                //light up red
-                timer.start(1000);
-                ui->redButton->animateClick();
-            }
-        }
-
-        pattern.push_back(rand() % 1 + 1);
-
-        if (true)
-        {
-            gameOver = true;
-            ui->statusLabel->setText("Game Over");
-        }
-    }
-
-//    void checkInputBlue()
-//    {
-
-//    }
-
-//    void checkInputRed()
-//    {
-
-//    }
 }
 

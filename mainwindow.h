@@ -15,7 +15,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void startButtonClickedSlot();
+
+public slots:
+    void flash(int colorCode);
 
 private:
     Ui::MainWindow *ui;
