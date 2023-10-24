@@ -13,9 +13,13 @@ public:
 signals:
     void flashColor(int colorCode);
     void disableStart(bool);
+    void gameOverSignal(bool);
+    void enableColorButtons(bool);
 
 public slots:
     void startButtonClickedSlot();
+    bool blueClicked();
+    bool redClicked();
 
 };
 

@@ -25,12 +25,9 @@ MainWindow::MainWindow(Model& model, QWidget *parent)
     connect(&model, &Model::flashColor, this, &MainWindow::flash);
     //              signal recieved     affects this class      uses the flash slot.
 
-//    connect(&model, &model::disableStart, ui->startButton, &QPushButton::setDisabled);
-//    //              signal recieved       button affected                action, in this case disabling the start button
+    connect(ui->blueButton, &QPushButton::clicked, &model, &Model::blueClicked);
 
-//    connect(&model, &model::disableStart, ui->blueButton, &QPushButton::setDisabled);
-
-//    connect(&model, &model::disableStart, ui->redButton, &QPushButton::setDisabled);
+    connect(ui->redButton, &QPushButton::clicked, &model, &Model::redClicked);
 
     connect(&model, &Model::disableStart, this,
             [this]() {
@@ -38,6 +35,20 @@ MainWindow::MainWindow(Model& model, QWidget *parent)
                 ui->blueButton->setDisabled(true);
                 ui->redButton->setDisabled(true);
     });
+
+    connect(&model, &Model::enableColorButtons, this,
+            [this]() {
+                ui->blueButton->setDisabled(false);
+                ui->redButton->setDisabled(false);
+            });
+
+    connect(&model, &Model::gameOverSignal, this,
+            [this]() {
+                ui->startButton->setDisabled(false);
+                ui->blueButton->setDisabled(true);
+                ui->redButton->setDisabled(true);
+                ui->statusLabel->setText("Game Over");
+            });
 
     gameOver = false;
 

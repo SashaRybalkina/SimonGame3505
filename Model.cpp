@@ -44,18 +44,36 @@ void Model::startButtonClickedSlot()
             });
         }
 
+        emit enableColorButtons(true);
+
+        int patternLength2 = pattern.size();
+        int index = 0;
+        while (patternLength2 > 0)
+        {
+            if (blueClicked() || redClicked())
+            {
+                if ((blueClicked() && pattern[index] != 0) || (redClicked() && pattern[index] != 1))
+                {
+                    emit gameOverSignal(true);
+                    gameOver = true;
+                    break;
+                }
+                index++;
+                patternLength2--;
+            }
+        }
+
         //increases the pattern by one every round
         pattern.push_back(arc4random() % 2);
-
-        //This is just the logic for invoking a game over. For now it will just break out of the
-        //loop after the first iteration. In the future, each iteration of the loop will be a new
-        //round, and once the player makes a mistake, this if statement will be invoked to send a
-        //game over signal and end the game.
-        if (true)
-        {
-            break;
-//          gameOver = true;
-//          ui->statusLabel->setText("Game Over");
-        }
     }
+}
+
+bool blueClicked()
+{
+    return true;
+}
+
+bool redClicked()
+{
+    return true;
 }
