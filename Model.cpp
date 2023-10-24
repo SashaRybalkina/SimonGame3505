@@ -1,4 +1,4 @@
-#include "model.h"
+#include "Model.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTimer>
@@ -7,12 +7,12 @@
 #include <stdlib.h>
 using std::vector;
 
-model::model(QObject *parent)
+Model::Model(QObject *parent)
     : QObject{parent}
 {
     gameOver = false;
 }
-void model::startButtonClickedSlot()
+void Model::startButtonClickedSlot()
 {
     //This sends the signal to MainWindow to make all buttons disabled
     emit disableStart(true);

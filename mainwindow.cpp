@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "model.h"
+#include "Model.h"
 #include <QTimer>
 #include <vector>
 #include <iostream>
@@ -9,7 +9,8 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(Model& model, QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -19,17 +20,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                                          "QPushButton:pressed {background-color: rgb(150,150,255);}"));
     ui->startButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,215,100);}"
                                           "QPushButton:pressed {background-color: rgb(250,215,150);}"));
-    connect(ui->startButton, &QPushButton::clicked, this, &model::startButtonClickedSlot);
+    connect(ui->startButton, &QPushButton::clicked, &model, &Model::startButtonClickedSlot);
 
-    connect(&model, &model::flashColor, this, &MainWindow::flash(flashColor));
+    connect(&model, &Model::flashColor, this, &MainWindow::flash);
     //              signal recieved     affects this class      uses the flash slot.
 
-    connect(&model, &model::disableStart, ui->startButton, &QPushButton::setDisabled);
-    //              signal recieved       button affected                action, in this case disabling the start button
+//    connect(&model, &model::disableStart, ui->startButton, &QPushButton::setDisabled);
+//    //              signal recieved       button affected                action, in this case disabling the start button
 
-    connect(&model, &model::disableStart, ui->blueButton, &QPushButton::setDisabled);
+//    connect(&model, &model::disableStart, ui->blueButton, &QPushButton::setDisabled);
 
-    connect(&model, &model::disableStart, ui->redButton, &QPushButton::setDisabled);
+//    connect(&model, &model::disableStart, ui->redButton, &QPushButton::setDisabled);
+
+    connect(&model, &Model::disableStart, this,
+            [this]() {
+                ui->startButton->setDisabled(true);
+                ui->blueButton->setDisabled(true);
+                ui->redButton->setDisabled(true);
+    });
 
     gameOver = false;
 
@@ -46,18 +54,28 @@ void MainWindow::flash(int colorCode)
     if (colorCode == 0)
     {
         //flash blue
-        ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(200,200,250);}"
-                                    "QPushButton:pressed {background-color: rgb(150,150,255);}"));
-        ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(100,100,250);}"
-                                    "QPushButton:pressed {background-color: rgb(150,150,255);}"));
+        QTimer::singleShot(1000, this, [=] () {
+            ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(200,200,250);}"
+                                                  "QPushButton:pressed {background-color: rgb(150,150,255);}"));
+        });
+        QTimer::singleShot(2000, this, [=] () {
+            ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(100,100,250);}"
+                                                  "QPushButton:pressed {background-color: rgb(150,150,255);}"));
+        });
     }
+
+
     else
     {
         //flash red
+        QTimer::singleShot(2000, this, [=] () {
         ui->redButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,200,200);}"
                                     "QPushButton:pressed {background-color: rgb(255,150,150);}"));
+        });
+        QTimer::singleShot(2000, this, [=] () {
         ui->redButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,100,100);}"
                                     "QPushButton:pressed {background-color: rgb(255,150,150);}"));
+        });
     }
 }
 
