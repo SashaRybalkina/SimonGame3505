@@ -1,79 +1,110 @@
 #include "Model.h"
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include <QTimer>
 #include <vector>
 #include <iostream>
-#include <stdlib.h>
 using std::vector;
 
-Model::Model(QObject *parent)
-    : QObject{parent}
+Model::Model(QObject *parent) : QObject{parent}
 {
-    gameOver = false;
 }
-void Model::startButtonClickedSlot()
-{
-    //This sends the signal to MainWindow to make all buttons disabled
-    emit disableStart(true);
 
-    //This will be the random pattern of button flashes
-    vector<int> pattern;
+void Model::startButtonClickedSlot(){
+    emit disableStart();
 
-    //The first round will have three button flashes
-    int patternLength = 3;
+    int patternLength = 2;
 
-    QTimer timer(this);
+    pattern.clear();
 
-    //This is where I generate the pattern for the buttons to flash. 0 = blue and 1 = red.
     while (patternLength > 0)
     {
         pattern.push_back(arc4random() % 2);
         patternLength--;
     }
 
-    while (!gameOver)
-    {
-        for (int i = 0; i < pattern.size(); i++)
-        {
-            //for every color code in the pattern, we will delay each color flash by a second
-            //and emit a flashColor signal with the current color code passed in as a parameter
-            //to let MainWindow know that the flash slot needs to be called.
-            QTimer::singleShot(i * 1000, this, [=] () {
-                emit flashColor(pattern[i]);
-            });
-        }
+    nextRound();
+}
 
-        emit enableColorButtons(true);
+void Model::nextRound() {
+    emit updateProgressBar(0);
+    pushbackColor();
 
-        int patternLength2 = pattern.size();
-        int index = 0;
-        while (patternLength2 > 0)
-        {
-            if (blueClicked() || redClicked())
-            {
-                if ((blueClicked() && pattern[index] != 0) || (redClicked() && pattern[index] != 1))
-                {
-                    emit gameOverSignal(true);
-                    gameOver = true;
-                    break;
-                }
-                index++;
-                patternLength2--;
-            }
-        }
+    index = 0;
+    current = 0;
 
-        //increases the pattern by one every round
-        pattern.push_back(arc4random() % 2);
+    QTimer::singleShot(500, this, &Model::lightOn);
+    QTimer::singleShot(700, this, &Model::lightOff);
+}
+
+void Model::pushbackColor(){
+    pattern.push_back(arc4random() % 2);
+}
+
+void Model::lightOn() {
+    if(index < (int)pattern.size()) {
+        color = pattern.at(index);
+        index++;
+        emit flashOn(color);
+        QTimer::singleShot(500, this, &Model::lightOn);
     }
 }
 
-bool blueClicked()
-{
-    return true;
+void Model::lightOff() {
+    int size = (int)pattern.size();
+    if(index < size){
+        emit flashOff(color);
+        QTimer::singleShot(500, this, &Model::lightOff);
+    }
+
+    else if(index == size){
+        lastButtonFlash();
+    }
+
 }
 
-bool redClicked()
-{
-    return true;
+void Model::lastButtonFlash() {
+    emit flashOff(color);
+    emit enableColorButtons();
 }
+void Model::blueClicked() {
+
+    if(pattern.at(current) == 1) {
+        current++;
+        updateProgress((double)current);
+
+        if(current == (int)pattern.size()) {
+            QTimer::singleShot(1000, this, &Model::nextRound);
+        }
+    }
+
+    else {
+        // restart game
+    }
+}
+
+void Model::redClicked() {
+
+     if(pattern.at(current) == 0) {
+        current++;
+
+        updateProgress((double)current);
+
+        if(current == (int)pattern.size()) {
+            QTimer::singleShot(1000, this, &Model::nextRound);
+        }
+    }
+    else {
+        // restart game
+    }
+}
+
+void Model::updateProgress(double i) {
+    double progress = i / (double) pattern.size() * 100;
+    emit updateProgressBar(progress);
+}
+
+
+void Model::gameOver(){
+    emit updateProgressBar(0);
+    pattern.clear();
+}
+

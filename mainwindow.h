@@ -10,7 +10,6 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
-    enum button { red, blue };
     Q_OBJECT
 
 public:
@@ -18,10 +17,11 @@ public:
     ~MainWindow();
 
 public slots:
-    void flash(int colorCode);
+    void flashColorOn(int colorCode);
+    void flashColorOff(int colorCode);
 
 private:
     Ui::MainWindow *ui;
-    bool gameOver;
 };
+
 #endif // MAINWINDOW_H

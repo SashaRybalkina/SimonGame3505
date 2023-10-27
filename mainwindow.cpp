@@ -1,57 +1,60 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "Model.h"
-#include <QTimer>
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
-using std::vector;
-using std::cout;
-using std::endl;
 
-MainWindow::MainWindow(Model& model, QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    ui->redButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,100,100);}"
-                                "QPushButton:pressed {background-color: rgb(255,150,150);}"));
-    ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(100,100,250);}"
+    // Set button colors
+    ui->redButton->setStyleSheet(QString("QPushButton {background-color: rgb(250,100,100);}"
+                                         "QPushButton:pressed {background-color: rgb(255,150,150);}"));
+    ui->blueButton->setStyleSheet(QString("QPushButton {background-color: rgb(100,100,250);}"
                                          "QPushButton:pressed {background-color: rgb(150,150,255);}"));
-    ui->startButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,215,100);}"
+    ui->startButton->setStyleSheet(QString("QPushButton {background-color: rgb(250,215,100);}"
                                           "QPushButton:pressed {background-color: rgb(250,215,150);}"));
-    connect(ui->startButton, &QPushButton::clicked, &model, &Model::startButtonClickedSlot);
 
-    connect(&model, &Model::flashColor, this, &MainWindow::flash);
-    //              signal recieved     affects this class      uses the flash slot.
+    // Connect the buttons with the functions
+    connect(ui -> startButton, &QPushButton::clicked, &model, &Model::startButtonClickedSlot);
+    connect(ui -> blueButton, &QPushButton::clicked, &model, &Model::blueClicked);
+    connect(ui -> redButton, &QPushButton::clicked, &model,&Model::redClicked);
 
-    connect(ui->blueButton, &QPushButton::clicked, &model, &Model::blueClicked);
+    // Disable blue and red buttons by default
+    ui -> blueButton -> setEnabled(false);
+    ui -> redButton -> setEnabled(false);
 
-    connect(ui->redButton, &QPushButton::clicked, &model, &Model::redClicked);
-
-    connect(&model, &Model::disableStart, this,
+    // Used lambda expresssions for controlling buttons
+    connect(&model, &Model::enableStartButton, this,
             [this]() {
-                ui->startButton->setDisabled(true);
-                ui->blueButton->setDisabled(true);
-                ui->redButton->setDisabled(true);
-    });
+                ui -> startButton -> setEnabled(true);
+            });
 
     connect(&model, &Model::enableColorButtons, this,
             [this]() {
-                ui->blueButton->setDisabled(false);
-                ui->redButton->setDisabled(false);
+                ui -> blueButton -> setEnabled(true);
+                ui -> redButton -> setEnabled(true);
+
             });
 
-    connect(&model, &Model::gameOverSignal, this,
+    connect(&model, &Model::disableStart, this,
             [this]() {
-                ui->startButton->setDisabled(false);
-                ui->blueButton->setDisabled(true);
-                ui->redButton->setDisabled(true);
-                ui->statusLabel->setText("Game Over");
+                ui -> startButton -> setEnabled(false);
+                ui -> blueButton -> setEnabled(false);
+                ui -> redButton -> setEnabled(false);
             });
 
-    gameOver = false;
+//    Game over
+//    connect(&model, &Model::gameOverSignal, this,
+//            [this]() {
+//                ui->startButton->setDisabled(false);
+//                ui->blueButton->setDisabled(true);
+//                ui->redButton->setDisabled(true);
+//                ui->statusLabel->setText("Game Over");
+//            });
 
+    connect(&model, &Model::flashOn, this, &MainWindow::flashColorOn);
+    connect(&model, &Model::flashOff, this, &MainWindow::flashColorOff);
+
+    connect(&model, &Model::updateProgressBar, ui->progressBar, &QProgressBar::setValue);
 }
 
 MainWindow::~MainWindow()
@@ -59,34 +62,30 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//This is the slot that is supposed to get called when a signal to flash colors is sent.
-void MainWindow::flash(int colorCode)
-{
-    if (colorCode == 0)
-    {
-        //flash blue
-        QTimer::singleShot(1000, this, [=] () {
-            ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(200,200,250);}"
-                                                  "QPushButton:pressed {background-color: rgb(150,150,255);}"));
-        });
-        QTimer::singleShot(2000, this, [=] () {
-            ui->blueButton->setStyleSheet( QString("QPushButton {background-color: rgb(100,100,250);}"
-                                                  "QPushButton:pressed {background-color: rgb(150,150,255);}"));
-        });
+void MainWindow::flashColorOn(int colorCode) {
+    // Red
+    if(colorCode == 0) {
+        ui -> redButton -> setStyleSheet(QString("QPushButton {background-color: rgb(255,150,150);}"
+                                                 "QPushButton:pressed {background-color: rgb(250,100,100);}"));
     }
-
-
-    else
-    {
-        //flash red
-        QTimer::singleShot(2000, this, [=] () {
-        ui->redButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,200,200);}"
-                                    "QPushButton:pressed {background-color: rgb(255,150,150);}"));
-        });
-        QTimer::singleShot(2000, this, [=] () {
-        ui->redButton->setStyleSheet( QString("QPushButton {background-color: rgb(250,100,100);}"
-                                    "QPushButton:pressed {background-color: rgb(255,150,150);}"));
-        });
+    // Blue
+    else {
+        ui -> blueButton -> setStyleSheet(QString("QPushButton {background-color: rgb(150,150,225);}"
+                                                  "QPushButton:pressed {background-color: rgb(100,100,250);}"));
     }
 }
 
+
+void MainWindow::flashColorOff(int colorCode) {
+    // Red
+    if(colorCode == 0) {
+        ui -> redButton -> setStyleSheet(QString("QPushButton {background-color: rgb(250,100,100);}"
+                                             "QPushButton:pressed {background-color: rgb(255,150,150);}"));
+    }
+    // Blue
+    else {
+        ui -> blueButton -> setStyleSheet(QString("QPushButton {background-color: rgb(100,100,250);}"
+                                                  "QPushButton:pressed {background-color: rgb(150,150,255);}"));
+    }
+
+}

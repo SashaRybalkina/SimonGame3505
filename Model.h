@@ -2,25 +2,48 @@
 #define MODEL_H
 
 #include <QObject>
+#include <vector>
+#include <iostream>
+using std::vector;
 
 class Model : public QObject
 {
     Q_OBJECT
+
 public:
     explicit Model(QObject *parent = nullptr);
-    bool gameOver;
 
-signals:
-    void flashColor(int colorCode);
-    void disableStart(bool);
-    void gameOverSignal(bool);
-    void enableColorButtons(bool);
+
+private:
+    vector<int> pattern;
+    int index;
+    int color;
+    int current;
 
 public slots:
     void startButtonClickedSlot();
-    bool blueClicked();
-    bool redClicked();
+    void pushbackColor();
+    void nextRound();
+    void updateProgress(double i);
+    void gameOver();
 
+    void lightOn();
+    void lightOff();
+    void lastButtonFlash();
+
+    void redClicked();
+    void blueClicked();
+
+
+signals:
+    void enableColorButtons();
+    void enableStartButton();
+    void disableStart();
+
+    void updateProgressBar(int percentage);
+
+    void flashOn(int colorCode);
+    void flashOff(int colorCode);
 };
 
 #endif // MODEL_H
