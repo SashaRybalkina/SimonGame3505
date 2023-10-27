@@ -5,7 +5,8 @@
 using std::vector;
 
 Model::Model(QObject *parent) : QObject{parent} {
-    lightSpeed = 1000;
+    lightSpeed = 1500;
+    speedValue = 1;
 }
 
 void Model::startButtonClickedSlot(){
@@ -32,8 +33,8 @@ void Model::nextRound() {
     pushbackColor();
     speedUp();
 
-    QTimer::singleShot(lightSpeed, this, &Model::lightOn);
-    QTimer::singleShot(lightSpeed * 1.5, this, &Model::lightOff);
+    QTimer::singleShot(lightSpeed/speedValue, this, &Model::lightOn);
+    QTimer::singleShot(lightSpeed/speedValue * 1.5, this, &Model::lightOff);
 }
 
 void Model::speedUp(){
@@ -51,7 +52,7 @@ void Model::lightOn() {
         color = pattern.at(index);
         index++;
         emit flashOn(color);
-        QTimer::singleShot(lightSpeed, this, &Model::lightOn);
+        QTimer::singleShot(lightSpeed/speedValue, this, &Model::lightOn);
     }
 }
 
@@ -59,7 +60,7 @@ void Model::lightOff() {
     int size = (int)pattern.size();
     if(index < size){
         emit flashOff(color);
-        QTimer::singleShot(lightSpeed, this, &Model::lightOff);
+        QTimer::singleShot(lightSpeed/speedValue, this, &Model::lightOff);
     }
 
     else if(index == size){
@@ -107,11 +108,17 @@ void Model::redClicked() {
 void Model::updateProgress(double i) {
     double progress = i / (double) pattern.size() * 100;
     emit updateProgressBar(progress);
+    emit updatePercentage(progress);
 }
 
 
 void Model::gameOver(){
     emit updateProgressBar(0);
     pattern.clear();
+}
+
+void Model::setSpeedValue(double value)
+{
+    speedValue = 1 + value/2;
 }
 

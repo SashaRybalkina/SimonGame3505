@@ -19,6 +19,11 @@ public:
 public slots:
     void flashColorOn(int colorCode);
     void flashColorOff(int colorCode);
+    void sendValue();
+    void setPercentage(int progress);
+
+signals:
+    void sliderValue(double speed);
 
 private:
     Ui::MainWindow *ui;

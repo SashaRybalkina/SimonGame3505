@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "Model.h"
+#include <QTimer>
 
 MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -18,9 +19,16 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
     connect(ui -> blueButton, &QPushButton::clicked, &model, &Model::blueClicked);
     connect(ui -> redButton, &QPushButton::clicked, &model,&Model::redClicked);
 
+    connect(ui -> speedSlider, &QSlider::sliderReleased, this, &MainWindow::sendValue);
+    connect(this, &MainWindow::sliderValue, &model, &Model::setSpeedValue);
+
     // Disable blue and red buttons by default
     ui -> blueButton -> setEnabled(false);
     ui -> redButton -> setEnabled(false);
+
+    ui -> speedSlider -> setRange(0, 10);
+    ui -> speedSlider -> sliderPosition();
+
 
     // Used lambda expresssions for controlling buttons
     connect(&model, &Model::enableStartButton, this,
@@ -55,11 +63,29 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
     connect(&model, &Model::flashOff, this, &MainWindow::flashColorOff);
 
     connect(&model, &Model::updateProgressBar, ui->progressBar, &QProgressBar::setValue);
+    connect(&model, &Model::updatePercentage, this, &MainWindow::setPercentage);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::sendValue()
+{
+    emit sliderValue(ui -> speedSlider -> value());
+}
+
+void MainWindow::setPercentage(int progress)
+{
+    QString percent = QString::number(progress) + "%";
+    ui -> percentage->setText(percent);
+    if (ui -> percentage -> text() == "100%")
+    {
+        QTimer::singleShot(1000, this, [=] () {
+            ui -> percentage->setText(QString::number(0) + "%");
+        });
+    }
 }
 
 void MainWindow::flashColorOn(int colorCode) {

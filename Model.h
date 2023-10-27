@@ -20,6 +20,7 @@ private:
     int color;
     int current;
     int lightSpeed;
+    double speedValue;
 
 public slots:
     void startButtonClickedSlot();
@@ -28,6 +29,7 @@ public slots:
     void speedUp();
     void updateProgress(double i);
     void gameOver();
+    void setSpeedValue(double value);
 
     void lightOn();
     void lightOff();
@@ -43,6 +45,7 @@ signals:
     void disableStart();
 
     void updateProgressBar(int percentage);
+    void updatePercentage(int percentage);
 
     void flashOn(int colorCode);
     void flashOff(int colorCode);
