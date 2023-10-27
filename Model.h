@@ -44,6 +44,8 @@ signals:
     void enableStartButton();
     void disableStart();
 
+    void gameOverSign();
+
     void updateProgressBar(int percentage);
     void updatePercentage(int percentage);
 

@@ -85,7 +85,7 @@ void Model::blueClicked() {
     }
 
     else {
-        // restart game
+        gameOver();
     }
 }
 
@@ -101,7 +101,7 @@ void Model::redClicked() {
         }
     }
     else {
-        // restart game
+        gameOver();
     }
 }
 
@@ -115,6 +115,8 @@ void Model::updateProgress(double i) {
 void Model::gameOver(){
     emit updateProgressBar(0);
     pattern.clear();
+
+    emit gameOverSign();
 }
 
 void Model::setSpeedValue(double value)

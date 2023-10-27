@@ -34,6 +34,7 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
     connect(&model, &Model::enableStartButton, this,
             [this]() {
                 ui -> startButton -> setEnabled(true);
+
             });
 
     connect(&model, &Model::enableColorButtons, this,
@@ -48,16 +49,18 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
                 ui -> startButton -> setEnabled(false);
                 ui -> blueButton -> setEnabled(false);
                 ui -> redButton -> setEnabled(false);
+                ui->gameOverLabel->setText("");
             });
 
-//    Game over
-//    connect(&model, &Model::gameOverSignal, this,
-//            [this]() {
-//                ui->startButton->setDisabled(false);
-//                ui->blueButton->setDisabled(true);
-//                ui->redButton->setDisabled(true);
-//                ui->statusLabel->setText("Game Over");
-//            });
+    //Game over
+    connect(&model, &Model::gameOverSign, this,
+            [this]() {
+                ui->startButton->setDisabled(false);
+                ui->blueButton->setDisabled(true);
+                ui->redButton->setDisabled(true);
+                ui->gameOverLabel->setText("Game Over");
+                ui -> percentage->setText("0%");
+            });
 
     connect(&model, &Model::flashOn, this, &MainWindow::flashColorOn);
     connect(&model, &Model::flashOff, this, &MainWindow::flashColorOff);
