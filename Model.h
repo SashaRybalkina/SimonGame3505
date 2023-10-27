@@ -19,11 +19,13 @@ private:
     int index;
     int color;
     int current;
+    int lightSpeed;
 
 public slots:
     void startButtonClickedSlot();
     void pushbackColor();
     void nextRound();
+    void speedUp();
     void updateProgress(double i);
     void gameOver();
 

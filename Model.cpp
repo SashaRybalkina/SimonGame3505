@@ -4,8 +4,8 @@
 #include <iostream>
 using std::vector;
 
-Model::Model(QObject *parent) : QObject{parent}
-{
+Model::Model(QObject *parent) : QObject{parent} {
+    lightSpeed = 1000;
 }
 
 void Model::startButtonClickedSlot(){
@@ -25,14 +25,21 @@ void Model::startButtonClickedSlot(){
 }
 
 void Model::nextRound() {
-    emit updateProgressBar(0);
-    pushbackColor();
-
     index = 0;
     current = 0;
 
-    QTimer::singleShot(500, this, &Model::lightOn);
-    QTimer::singleShot(700, this, &Model::lightOff);
+    emit updateProgressBar(0);
+    pushbackColor();
+    speedUp();
+
+    QTimer::singleShot(lightSpeed, this, &Model::lightOn);
+    QTimer::singleShot(lightSpeed * 1.5, this, &Model::lightOff);
+}
+
+void Model::speedUp(){
+    if(lightSpeed > 200) {
+       lightSpeed -= 200;
+    }
 }
 
 void Model::pushbackColor(){
@@ -44,7 +51,7 @@ void Model::lightOn() {
         color = pattern.at(index);
         index++;
         emit flashOn(color);
-        QTimer::singleShot(500, this, &Model::lightOn);
+        QTimer::singleShot(lightSpeed, this, &Model::lightOn);
     }
 }
 
@@ -52,7 +59,7 @@ void Model::lightOff() {
     int size = (int)pattern.size();
     if(index < size){
         emit flashOff(color);
-        QTimer::singleShot(500, this, &Model::lightOff);
+        QTimer::singleShot(lightSpeed, this, &Model::lightOff);
     }
 
     else if(index == size){
