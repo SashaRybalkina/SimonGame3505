@@ -76,7 +76,7 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
                 ui->percentage->setText("0%");
             });
 
-    // Controlls red, blue buttons flashing
+    // Controls red, blue buttons flashing
     connect(&model, &Model::flashOn, this, &MainWindow::flashColorOn);
     connect(&model, &Model::flashOff, this, &MainWindow::flashColorOff);
 
