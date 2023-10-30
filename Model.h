@@ -34,15 +34,13 @@ private:
 
 public slots:
     // start button clicked
-    void startButtonClickedSlot();
-    // adds new color
-    void pushbackColor();
+    void startClicked();
     // prepares next round
     void nextRound();
     // speeds up the game
     void speedUp();
     // updates the progress bar
-    void updateProgress(double i);
+    void updateProgress(double progressValue);
     // when game over
     void gameOver();
     // sets game speed to what user wanted

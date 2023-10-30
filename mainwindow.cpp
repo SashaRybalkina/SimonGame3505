@@ -18,7 +18,7 @@
 MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    // Set button colors - red, blue, start buttons
+    // Set the colors of all the buttons
     ui->redButton->setStyleSheet(QString("QPushButton {background-color: rgb(250,100,100);}"
                                          "QPushButton:pressed {background-color: rgb(255,150,150);}"));
     ui->blueButton->setStyleSheet(QString("QPushButton {background-color: rgb(100,100,250);}"
@@ -26,12 +26,12 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
     ui->startButton->setStyleSheet(QString("QPushButton {background-color: rgb(250,215,100);}"
                                           "QPushButton:pressed {background-color: rgb(250,215,150);}"));
 
-    // Connect the buttons with the models
-    connect(ui -> startButton, &QPushButton::clicked, &model, &Model::startButtonClickedSlot);
+    // Connect the buttons with specific slots in the Model class.
+    connect(ui -> startButton, &QPushButton::clicked, &model, &Model::startClicked);
     connect(ui -> blueButton, &QPushButton::clicked, &model, &Model::blueClicked);
     connect(ui -> redButton, &QPushButton::clicked, &model,&Model::redClicked);
 
-    // Speed slider for controlling the speed
+    // Sets the speed of the game with a horizontal slider
     connect(ui -> speedSlider, &QSlider::sliderReleased, this, &MainWindow::sendValue);
     connect(this, &MainWindow::sliderValue, &model, &Model::setSpeedValue);
 
@@ -39,18 +39,16 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
     ui -> blueButton -> setEnabled(false);
     ui -> redButton -> setEnabled(false);
 
-    // Set speed
+    // Set the range of speed the rounds can have
     ui -> speedSlider -> setRange(0, 10);
-    ui -> speedSlider -> sliderPosition();
 
-
-    // Used lambda expresssions for controlling buttons
+    // Enables the start button before the start of every game.
     connect(&model, &Model::enableStartButton, this,
             [this]() {
                 ui -> startButton -> setEnabled(true);
-
             });
 
+    // Enables the color buttons once the start button is clicked.
     connect(&model, &Model::enableColorButtons, this,
             [this]() {
                 ui -> blueButton -> setEnabled(true);
@@ -58,6 +56,7 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
 
             });
 
+    // Disables the start button once the game begins
     connect(&model, &Model::disableStart, this,
             [this]() {
                 ui -> startButton -> setEnabled(false);
@@ -76,7 +75,7 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
                 ui->percentage->setText("0%");
             });
 
-    // Controls red, blue buttons flashing
+    // Controls the flashing of the red and blue buttons
     connect(&model, &Model::flashOn, this, &MainWindow::flashColorOn);
     connect(&model, &Model::flashOff, this, &MainWindow::flashColorOff);
 
@@ -86,7 +85,7 @@ MainWindow::MainWindow(Model& model, QWidget *parent) : QMainWindow(parent), ui(
 }
 
 /**
- * @brief MainWindow::~MainWindow Deconstructor
+ * @brief Destructor
  */
 MainWindow::~MainWindow()
 {
@@ -94,7 +93,7 @@ MainWindow::~MainWindow()
 }
 
 /**
- * @brief MainWindow::sendValue Send speed value of the speed slider
+ * @brief Send value of the speed slider
  */
 void MainWindow::sendValue()
 {
@@ -102,8 +101,8 @@ void MainWindow::sendValue()
 }
 
 /**
- * @brief MainWindow::setPercentage Update progress percentage display
- * @param progress Current progress percentage
+ * @brief Update progress percentage display
+ * @param progress: Current progress percentage
  */
 void MainWindow::setPercentage(int progress)
 {
@@ -118,8 +117,8 @@ void MainWindow::setPercentage(int progress)
 }
 
 /**
- * @brief MainWindow::flashColorOn Light up the color
- * @param colorCode 0 Red, 1 Blue
+ * @brief Lights up a specific color button
+ * @param colorCode: 0 for Red or 1 for Blue
  */
 void MainWindow::flashColorOn(int colorCode) {
     // Red
@@ -135,8 +134,8 @@ void MainWindow::flashColorOn(int colorCode) {
 }
 
 /**
- * @brief MainWindow::flashColorOff Light off the color
- * @param colorCode 0 Red, 1 Blue
+ * @brief Lights off a specific color button
+ * @param colorCode: 0 for Red or 1 for Blue
  */
 void MainWindow::flashColorOff(int colorCode) {
     // Red
@@ -149,5 +148,4 @@ void MainWindow::flashColorOff(int colorCode) {
         ui -> blueButton -> setStyleSheet(QString("QPushButton {background-color: rgb(100,100,250);}"
                                                   "QPushButton:pressed {background-color: rgb(150,150,255);}"));
     }
-
 }

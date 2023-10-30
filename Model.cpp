@@ -12,8 +12,7 @@
 using std::vector;
 
 /**
- * @brief Model::Model Constructor
- * @param parent Parent object
+ * @brief Model constructor. Sets initial speed and inherits from QObject.
  */
 Model::Model(QObject *parent) : QObject{parent} {
     lightSpeed = 1500;
@@ -21,14 +20,13 @@ Model::Model(QObject *parent) : QObject{parent} {
 }
 
 /**
- * @brief Model::startButtonClickedSlot When start button is clicked
+ * @brief Starts the game when the start button is clicked by creating
+ * an initial pattern of three
  */
-void Model::startButtonClickedSlot(){
+void Model::startClicked(){
     emit disableStart();
 
     int patternLength = 2;
-
-    pattern.clear();
 
     // Randomly generates pattern(red/blue)
     while (patternLength > 0)
@@ -41,7 +39,7 @@ void Model::startButtonClickedSlot(){
 }
 
 /**
- * @brief Model::nextRound Prepare game for next round
+ * Prepares the game for the next round
  */
 void Model::nextRound() {
     index = 0;
@@ -50,7 +48,7 @@ void Model::nextRound() {
     emit updateProgressBar(0);
 
     // Add one more color and speed up
-    pushbackColor();
+    pattern.push_back(arc4random() % 2);
     speedUp();
 
     QTimer::singleShot(lightSpeed/speedValue, this, &Model::lightOn);
@@ -58,7 +56,7 @@ void Model::nextRound() {
 }
 
 /**
- * @brief Model::speedUp Speeds of the game every round
+ * @brief Speeds up the game every round
  */
 void Model::speedUp(){
     if(lightSpeed > 200) {
@@ -67,14 +65,7 @@ void Model::speedUp(){
 }
 
 /**
- * @brief Model::pushbackColor Adds one more color
- */
-void Model::pushbackColor(){
-    pattern.push_back(arc4random() % 2);
-}
-
-/**
- * @brief Model::lightOn Light on color
+ * @brief Slot for turning the light on color for a specific color.
  */
 void Model::lightOn() {
     if(index < (int)pattern.size()) {
@@ -86,7 +77,7 @@ void Model::lightOn() {
 }
 
 /**
- * @brief Model::lightOff Light off color
+ * @brief Slot for turning the light off color for a specific color.
  */
 void Model::lightOff() {
     int size = (int)pattern.size();
@@ -98,11 +89,10 @@ void Model::lightOff() {
     else if(index == size){
         lastButtonFlash();
     }
-
 }
 
 /**
- * @brief Model::lastButtonFlash When last button flashes, enables color buttons
+ * @brief Enables the color buttons when the last color of the round flashes.
  */
 void Model::lastButtonFlash() {
     emit flashOff(color);
@@ -110,7 +100,8 @@ void Model::lastButtonFlash() {
 }
 
 /**
- * @brief Model::blueClicked Check if user guessed right when clicked blue
+ * @brief Checks if the user pressed on blue when they are supposed to. If not,
+ * calls the game over method.
  */
 void Model::blueClicked() {
 
@@ -129,7 +120,8 @@ void Model::blueClicked() {
 }
 
 /**
- * @brief Model::redClicked Check if user guessed right when clicked red
+ * @brief Checks if the user pressed on red when they are supposed to. If not,
+ * calls the game over method.
  */
 void Model::redClicked() {
 
@@ -148,18 +140,19 @@ void Model::redClicked() {
 }
 
 /**
- * @brief Model::updateProgress Updates progress bar
- * @param i current index
+ * @brief Updates the progress bar and displays the current percentage on a seperate
+ * label
+ * @param progressValue: current percentage of the progress completed
  */
-void Model::updateProgress(double i) {
-    double progress = i / (double) pattern.size() * 100;
+void Model::updateProgress(double progressValue) {
+    double progress = progressValue / (double) pattern.size() * 100;
     emit updateProgressBar(progress);
     emit updatePercentage(progress);
 }
 
-
 /**
- * @brief Model::gameOver Updates progress bar and clears pattern list when game over
+ * @brief Updates progress bar and clears the pattern list when the player gets a game
+ * over
  */
 void Model::gameOver(){
     emit updateProgressBar(0);
@@ -170,7 +163,8 @@ void Model::gameOver(){
 }
 
 /**
- * @brief Model::setSpeedValue Adjust the speed value
+ * @brief Slot for adjusting the speed of the rounds. Gets the value of the horizontal
+ * slider and applies it to the logic of the speed.
  * @param value speed
  */
 void Model::setSpeedValue(double value)
