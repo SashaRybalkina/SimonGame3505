@@ -164,6 +164,7 @@ void Model::updateProgress(double i) {
 void Model::gameOver(){
     emit updateProgressBar(0);
     pattern.clear();
+    lightSpeed = 1500;
 
     emit gameOverSign();
 }
